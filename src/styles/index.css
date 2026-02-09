@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@import "tailwindcss";
+
+/* Daftarkan semua varian font */
+@font-face {
+    font-family: "SF Pro";
+    src: url("../assets/fonts/SF-Pro-Text-Semibold.otf") format("opentype");
+    font-weight: 600; /* Semibold */
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "SF Pro";
+    src: url("../assets/fonts/SF-Pro-Text-Bold.otf") format("opentype");
+    font-weight: 700; /* Bold */
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "SF Pro";
+    src: url("../assets/fonts/SF-Pro-Text-Heavy.otf") format("opentype");
+    font-weight: 800; /* Heavy */
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "SF Pro";
+    src: url("../assets/fonts/SF-Pro-Text-Black.otf") format("opentype");
+    font-weight: 900; /* Black */
+    font-style: normal;
+}
+
+body {
+    font-family: "SF Pro", sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #F9FAFB;
+}
