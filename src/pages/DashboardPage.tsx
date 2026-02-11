@@ -5,29 +5,30 @@ import { getBookings } from "../api/bookings";
 import "../styles/index.css";
 
 export default function DashboardPage() {
+  const [allBookings, setAllBookings] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const totalBookings = recent.length;
+  const totalBookings = allBookings.length;
 
-  const activeBookings = recent.filter((b) => {
+  const activeBookings = allBookings.filter((b) => {
     const now = new Date();
     const start = new Date(b.start);
     const end = new Date(b.end);
-    // Sedang berjalan jika waktu sekarang berada di antara start dan end
     return now >= start && now <= end && b.status === "Approved";
   }).length;
 
-  const pendingRequests = recent.filter((b) => b.status === "Pending").length;
+  const pendingRequests = allBookings.filter(
+    (b) => b.status === "Pending",
+  ).length;
 
   useEffect(() => {
     getBookings()
       .then((data) => {
         const sorted = [...data].sort((a, b) => b.id - a.id);
+        setAllBookings(sorted);
         setRecent(sorted.slice(0, 3));
       })
-      .catch((err) => {
-        console.error("Gagal ambil booking:", err);
-      })
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
@@ -164,11 +165,11 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold text-black">Recent Bookings</h3>
             <Link
-              to="/history"
+              to="/all-bookings"
               className="text-sm flex items-center gap-1"
               style={{ color: "black" }}
             >
-              See all history
+              See all bookings
               <svg
                 className="w-4 h-4"
                 fill="none"
