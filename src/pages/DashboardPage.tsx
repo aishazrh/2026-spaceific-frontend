@@ -7,6 +7,17 @@ import "../styles/index.css";
 export default function DashboardPage() {
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const totalBookings = recent.length;
+
+  const activeBookings = recent.filter((b) => {
+    const now = new Date();
+    const start = new Date(b.start);
+    const end = new Date(b.end);
+    // Sedang berjalan jika waktu sekarang berada di antara start dan end
+    return now >= start && now <= end && b.status === "Approved";
+  }).length;
+
+  const pendingRequests = recent.filter((b) => b.status === "Pending").length;
 
   useEffect(() => {
     getBookings()
@@ -55,21 +66,19 @@ export default function DashboardPage() {
 
         {/* 3 THINGY */}
         <div className="flex flex-wrap gap-3 mb-8">
+          {/* TOTAL BOOKINGS */}
           <div className="flex-1 min-w-75 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            {/* Bagian Atas: Konten Utama */}
             <div className="flex items-center gap-5 p-6">
               <div className="bg-[#FEF3C7] w-16 h-16 flex items-center justify-center rounded-2xl">
-                <p className="text-3xl font-black text-amber-900">9</p>
+                <p className="text-3xl font-black text-amber-900">
+                  {totalBookings}
+                </p>
               </div>
               <p className="text-xl font-bold text-gray-800">Total Bookings</p>
             </div>
-
-            {/* Garis Pemisah */}
             <div className="border-t border-gray-100"></div>
-
-            {/* Bagian Bawah: See Details */}
             <Link
-              to="/history"
+              to="/all-bookings"
               className="mt-auto flex flex-row gap-3 w-full p-4 rounded-lg font-bold bg-gray-50! text-gray-500! no-underline transition-all duration-200active:scale-95 hover:bg-white! hover:text-black!"
             >
               <div className="basis-9/10">See details</div>
@@ -87,21 +96,19 @@ export default function DashboardPage() {
             </Link>
           </div>
 
+          {/* ACTIVE BOOKINGS */}
           <div className="flex-1 min-w-75 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            {/* Bagian Atas: Konten Utama */}
             <div className="flex items-center gap-5 p-6">
               <div className="bg-[#FEF3C7] w-16 h-16 flex items-center justify-center rounded-2xl">
-                <p className="text-3xl font-black text-amber-900">9</p>
+                <p className="text-3xl font-black text-amber-900">
+                  {activeBookings}
+                </p>
               </div>
               <p className="text-xl font-bold text-gray-800">Active Bookings</p>
             </div>
-
-            {/* Garis Pemisah */}
             <div className="border-t border-gray-100"></div>
-
-            {/* Bagian Bawah: See Details */}
             <Link
-              to="/history"
+              to="/all-bookings"
               className="mt-auto flex flex-row gap-3 w-full p-4 rounded-lg font-bold bg-gray-50! text-gray-500! no-underline transition-all duration-200active:scale-95 hover:bg-white! hover:text-black!"
             >
               <div className="basis-9/10">See details</div>
@@ -119,23 +126,21 @@ export default function DashboardPage() {
             </Link>
           </div>
 
+          {/* PENDING REQUESTS */}
           <div className="flex-1 min-w-75 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            {/* Bagian Atas: Konten Utama */}
             <div className="flex items-center gap-5 p-6">
               <div className="bg-[#FEF3C7] w-16 h-16 flex items-center justify-center rounded-2xl">
-                <p className="text-3xl font-black text-amber-900">9</p>
+                <p className="text-3xl font-black text-amber-900">
+                  {pendingRequests}
+                </p>
               </div>
               <p className="text-xl font-bold text-gray-800">
                 Pending Requests
               </p>
             </div>
-
-            {/* Garis Pemisah */}
             <div className="border-t border-gray-100"></div>
-
-            {/* Bagian Bawah: See Details */}
             <Link
-              to="/history"
+              to="/all-bookings"
               className="mt-auto flex flex-row gap-3 w-full p-4 rounded-lg font-bold bg-gray-50! text-gray-500! no-underline transition-all duration-200active:scale-95 hover:bg-white! hover:text-black!"
             >
               <div className="basis-9/10">See details</div>
@@ -192,6 +197,8 @@ export default function DashboardPage() {
                 <thead className="text-center">
                   <tr className="text-gray-400 text-sm uppercase tracking-wider">
                     <th className="px-4 py-2 font-bold">ID</th>
+                    <th className="px-4 py-2 font-bold">First Name</th>
+                    <th className="px-4 py-2 font-bold">Last Name</th>
                     <th className="px-4 py-2 font-bold">Room</th>
                     <th className="px-4 py-2 font-bold">Purpose</th>
                     <th className="px-4 py-2 font-bold text-center">Status</th>
@@ -201,6 +208,8 @@ export default function DashboardPage() {
                   {recent.map((b) => (
                     <tr key={b.id} className="text-sm">
                       <td className="px-4 py-1">{b.id}</td>
+                      <td className="px-4 py-1">{b.firstName}</td>
+                      <td className="px-4 py-1">{b.lastName}</td>
                       <td className="px-4 py-1">{b.room}</td>
                       <td className="px-4 py-1">{b.purpose}</td>
                       <td className="px-4 py-1 text-center">
