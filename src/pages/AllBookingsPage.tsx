@@ -84,10 +84,10 @@ export default function HistoryPage() {
       const data = await getBookings();
       setBookings(data);
 
-      toast.success("Status booking berhasil diupdate :)");
+      toast.success("Status updated! :)");
       return true;
     } catch (err) {
-      toast.error("Gagal update status :(");
+      toast.error("Update failed :(");
       return false;
     }
   }
@@ -150,7 +150,7 @@ export default function HistoryPage() {
               {paginatedBookings.length === 0 && !loading && (
                 <tr>
                   <td colSpan={10} className="py-6 text-center text-gray-400">
-                    Data tidak ditemukan
+                    Data not found
                   </td>
                 </tr>
               )}
