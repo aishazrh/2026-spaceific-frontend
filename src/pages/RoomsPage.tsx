@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { getRooms, deleteRoom, createRoom, updateRoom } from "../api/rooms";
 import toast from "react-hot-toast";
+import { formatToWIB } from "../utils/date";
 
 export default function RoomsPage() {
   const [search, setSearch] = useState("");
@@ -36,19 +37,26 @@ export default function RoomsPage() {
     setCurrentPage(1);
   }, [search, rooms.length]);
 
-  async function handleDelete(id: number) {
-    if (!confirm("Yakin mau hapus room ini?")) return;
+  // delete
+  const [openDelete, setOpenDelete] = useState(false);
+  const [deleteRoomId, setDeleteRoomId] = useState<number | null>(null);
+
+  async function handleDelete() {
+    if (!deleteRoomId) return;
 
     try {
-      await deleteRoom(id);
+      await deleteRoom(deleteRoomId);
       const data = await getRooms();
       setRooms(data);
-      toast.success("Room berhasil dihapus");
+      toast.success("Room deleted successfully! :)");
+      setOpenDelete(false);
+      setDeleteRoomId(null);
     } catch {
-      toast.error("Gagal hapus room");
+      toast.error("Failed to delete room :(");
     }
   }
 
+  // create
   const [openCreate, setOpenCreate] = useState(false);
 
   const [form, setForm] = useState({
@@ -73,11 +81,11 @@ export default function RoomsPage() {
       const data = await getRooms();
       setRooms(data);
 
-      toast.success("Room added! :)");
+      toast.success("Room added successfully! :)");
       setOpenCreate(false);
       setForm({ name: "", building: "", capacity: 0 });
     } catch {
-      toast.error("Add failed :(");
+      toast.error("Failed to add room :(");
     }
   }
 
@@ -144,6 +152,7 @@ export default function RoomsPage() {
     );
   }
 
+  // edit
   const [openEdit, setOpenEdit] = useState(false);
   const [editingRoom, setEditingRoom] = useState<any | null>(null);
 
@@ -171,13 +180,17 @@ export default function RoomsPage() {
       const data = await getRooms();
       setRooms(data);
 
-      toast.success("Room edited! :)");
+      toast.success("Room edited successfully! :)");
       setOpenEdit(false);
       setEditingRoom(null);
     } catch {
-      toast.error("Edit failed :(");
+      toast.error("Failed to edit room :(");
     }
   }
+
+  // view
+  const [openView, setOpenView] = useState(false);
+  const [viewRoom, setViewRoom] = useState<any | null>(null);
 
   return (
     <Layout>
@@ -268,7 +281,13 @@ export default function RoomsPage() {
                   <td className="px-4 py-1 text-center">
                     <div className="flex justify-center gap-3">
                       {/* BUTTON VIEW */}
-                      <button className="hover:text-blue-500">
+                      <button
+                        onClick={() => {
+                          setViewRoom(r);
+                          setOpenView(true);
+                        }}
+                        className="hover:text-blue-500"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="16"
@@ -309,7 +328,10 @@ export default function RoomsPage() {
 
                       {/* BUTTON DELETE */}
                       <button
-                        onClick={() => handleDelete(r.id)}
+                        onClick={() => {
+                          setDeleteRoomId(r.id);
+                          setOpenDelete(true);
+                        }}
                         className="hover:text-red-500"
                       >
                         <svg
@@ -462,7 +484,7 @@ export default function RoomsPage() {
 
               <button
                 onClick={handleCreateRoom}
-                className="px-4 py-2 rounded bg-[#FEF3C7]! hover:bg-[#fde68a] font-semibold"
+                className="px-4 py-2 rounded bg-[#FEF3C7]! hover:bg-[#fde68a]! font-semibold"
               >
                 Save
               </button>
@@ -531,9 +553,98 @@ export default function RoomsPage() {
 
               <button
                 onClick={handleUpdateRoom}
-                className="px-4 py-2 rounded bg-[#FEF3C7] hover:bg-[#fde68a] font-semibold"
+                className="px-4 py-2 rounded bg-[#FEF3C7]! hover:bg-[#fde68a]! font-semibold"
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL VIEW */}
+      {openView && viewRoom && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-lg">
+            <h2 className="text-xl font-bold mb-4 text-center">Room Detail</h2>
+
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Room ID</span>
+                <span className="font-semibold">{viewRoom.id}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-500">Room Code</span>
+                <span className="font-semibold">{viewRoom.name}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-500">Building</span>
+                <span className="font-semibold">{viewRoom.building}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-500">Capacity</span>
+                <span className="font-semibold">{viewRoom.capacity}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-500">Created At</span>
+                <span className="font-semibold">
+                  {formatToWIB(viewRoom.createdAt)}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-500">Updated At</span>
+                <span className="font-semibold">
+                  {formatToWIB(viewRoom.updatedAt)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => {
+                  setOpenView(false);
+                  setViewRoom(null);
+                }}
+                className="px-4 py-2 rounded bg-[#FEF3C7] hover:bg-[#fde68a] font-semibold"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DELETE */}
+      {openDelete && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-sm p-6 shadow-lg">
+            <h2 className="text-lg font-bold mb-2 text-red-600 text-center">Delete Room</h2>
+
+            <p className="text-sm text-gray-600 mb-5">
+              Are you sure you want to delete this room? You won't be able to undo this action.
+            </p>
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setOpenDelete(false);
+                  setDeleteRoomId(null);
+                }}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 rounded bg-red-500! text-white! hover:bg-red-600!"
+              >
+                Delete
               </button>
             </div>
           </div>
