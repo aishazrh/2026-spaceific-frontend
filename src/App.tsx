@@ -4,16 +4,49 @@ import AllBookings from "./pages/AllBookingsPage";
 import Rooms from "./pages/RoomsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/user" element={<Rooms />} />
-      <Route path="/admin" element={<DashboardPage />} />
-      <Route path="/all-bookings" element={<AllBookings />} />
-      <Route path="/rooms" element={<Rooms />} />
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute role="Admin">
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/user"
+        element={
+          <ProtectedRoute>
+            <Rooms />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/rooms"
+        element={
+          <ProtectedRoute>
+            <Rooms />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/all-bookings"
+        element={
+          <ProtectedRoute>
+            <AllBookings />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
