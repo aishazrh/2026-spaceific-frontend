@@ -5,8 +5,12 @@ import { formatToWIB } from "../utils/date";
 import { updateBookingStatus } from "../api/bookings";
 import toast from "react-hot-toast";
 import "../styles/index.css";
+import { getCurrentUser } from "../utils/auth";
 
 export default function HistoryPage() {
+  const user = getCurrentUser();
+  const isAdmin = user?.role === "Admin";
+
   const [search, setSearch] = useState("");
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,11 +49,16 @@ export default function HistoryPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
 
+  async function getMyBookings() {
+    return fetch("/api/bookings/my").then((res) => res.json());
+  }
+
   useEffect(() => {
-    getBookings()
+    const fetch = isAdmin ? getBookings : getMyBookings;
+    fetch()
       .then(setBookings)
       .finally(() => setLoading(false));
-  }, []);
+  }, [isAdmin]);
 
   const filteredBookings = bookings.filter((b) => {
     const q = search.toLowerCase();
@@ -124,7 +133,9 @@ export default function HistoryPage() {
       </div>
 
       {/* JUDUL */}
-      <p className="text-3xl font-extrabold mb-6">All Bookings</p>
+      <p className="text-3xl font-extrabold mb-6">
+        {isAdmin ? "All Bookings" : "History"}
+      </p>
 
       {/* TABEL */}
       {loading ? (
@@ -181,79 +192,87 @@ export default function HistoryPage() {
                     </span>
                   </td>
                   <td className="px-4 py-1 relative">
-                    <div className="relative inline-block text-center">
-                      <button
-                        type="button"
-                        onClick={(e) => toggleDropdown(e, b.id)} // Pakai fungsi deteksi
-                        className="border px-3 py-1 rounded bg-white hover:bg-gray-50"
-                      >
-                        Change status
-                      </button>
+                    {isAdmin ? (
+                      <div className="relative inline-block text-center">
+                        <button
+                          type="button"
+                          onClick={(e) => toggleDropdown(e, b.id)} // Pakai fungsi deteksi
+                          className="border px-3 py-1 rounded bg-white hover:bg-gray-50"
+                        >
+                          Change status
+                        </button>
 
-                      {openDropdown === b.id && (
-                        <div
-                          className={`
+                        {openDropdown === b.id && (
+                          <div
+                            className={`
                             absolute z-20 w-40 bg-white rounded-lg shadow-lg border p-2 left-1/2 -translate-x-1/2
                             ${dropdownDirection === "up" ? "bottom-full mb-2" : "top-full mt-2"}
                           `}
-                        >
-                          <button
-                            onClick={() =>
-                              setSelectedStatus((prev) => ({
-                                ...prev,
-                                [b.id]: "Approved",
-                              }))
-                            }
-                            className="block w-full text-center px-3 py-1 rounded hover:bg-green-100"
                           >
-                            Approve
-                          </button>
+                            <button
+                              onClick={() =>
+                                setSelectedStatus((prev) => ({
+                                  ...prev,
+                                  [b.id]: "Approved",
+                                }))
+                              }
+                              className="block w-full text-center px-3 py-1 rounded hover:bg-green-100"
+                            >
+                              Approve
+                            </button>
 
-                          <button
-                            onClick={() =>
-                              setSelectedStatus((prev) => ({
-                                ...prev,
-                                [b.id]: "Rejected",
-                              }))
-                            }
-                            className="block w-full text-center px-3 py-1 rounded hover:bg-red-100"
-                          >
-                            Reject
-                          </button>
+                            <button
+                              onClick={() =>
+                                setSelectedStatus((prev) => ({
+                                  ...prev,
+                                  [b.id]: "Rejected",
+                                }))
+                              }
+                              className="block w-full text-center px-3 py-1 rounded hover:bg-red-100"
+                            >
+                              Reject
+                            </button>
 
-                          <button
-                            onClick={() =>
-                              setSelectedStatus((prev) => ({
-                                ...prev,
-                                [b.id]: "Pending",
-                              }))
-                            }
-                            className="block w-full text-center px-3 py-1 rounded hover:bg-blue-100"
-                          >
-                            Pending
-                          </button>
+                            <button
+                              onClick={() =>
+                                setSelectedStatus((prev) => ({
+                                  ...prev,
+                                  [b.id]: "Pending",
+                                }))
+                              }
+                              className="block w-full text-center px-3 py-1 rounded hover:bg-blue-100"
+                            >
+                              Pending
+                            </button>
 
-                          <hr className="my-2" />
+                            <hr className="my-2" />
 
-                          <button
-                            disabled={!selectedStatus[b.id]}
-                            onClick={() =>
-                              setConfirmModal({
-                                id: b.id,
-                                status: selectedStatus[b.id],
-                              })
-                            }
-                            className={`w-full px-3 py-1 rounded text-sm ${
-                              selectedStatus[b.id]
-                                ? "text-black"
-                                : "text-black cursor-not-allowed"
-                            }`}
-                          >
-                            Submit
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                            <button
+                              disabled={!selectedStatus[b.id]}
+                              onClick={() =>
+                                setConfirmModal({
+                                  id: b.id,
+                                  status: selectedStatus[b.id],
+                                })
+                              }
+                              className={`w-full px-3 py-1 rounded text-sm ${
+                                selectedStatus[b.id]
+                                  ? "text-black"
+                                  : "text-black cursor-not-allowed"
+                              }`}
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex justify-center gap-3">
+                        <button>👁️</button>
+                        <button>✏️</button>
+                        <button>🗑️</button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
