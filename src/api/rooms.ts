@@ -1,7 +1,13 @@
 import { API_BASE_URL } from "../config/api";
 
 export async function getRooms() {
-  const res = await fetch(`${API_BASE_URL}/rooms`);
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_BASE_URL}/rooms`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!res.ok) throw new Error("Gagal fetch rooms");
 
@@ -13,10 +19,13 @@ export async function createRoom(data: {
   building: string;
   capacity: number;
 }) {
+  const token = localStorage.getItem("token");
+
   const res = await fetch(`${API_BASE_URL}/rooms`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -34,33 +43,31 @@ export async function updateRoom(
   id: number,
   data: { name: string; building: string; capacity: number },
 ) {
+  const token = localStorage.getItem("token");
+
   const res = await fetch(`${API_BASE_URL}/rooms/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("API Error:", text);
-    throw new Error("Gagal update room");
-  }
-
+  if (!res.ok) throw new Error("Gagal update room");
   return res.json();
 }
 
 export async function deleteRoom(id: number) {
+  const token = localStorage.getItem("token");
+
   const res = await fetch(`${API_BASE_URL}/rooms/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("API Error:", text);
-    throw new Error("Gagal delete room");
-  }
-
+  if (!res.ok) throw new Error("Gagal delete room");
   return null;
 }
