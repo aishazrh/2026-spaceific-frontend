@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import { getBookings } from "../api/bookings";
 import { formatToWIB } from "../utils/date";
-import { updateBookingStatus } from "../api/bookings";
 import toast from "react-hot-toast";
 import "../styles/index.css";
 import { getCurrentUser } from "../utils/auth";
+import {
+  updateBookingStatus,
+  createBooking,
+  // updateMyBooking,
+  deleteMyBooking,
+  getBookings,
+  getMyBookings,
+} from "../api/bookings";
+import { getRooms } from "../api/rooms";
 
 export default function HistoryPage() {
   const user = getCurrentUser();
   const isAdmin = user?.role === "Admin";
+  if (!user) {
+    throw new Error("User not logged in");
+  }
 
   const [search, setSearch] = useState("");
   const [bookings, setBookings] = useState<any[]>([]);
@@ -48,10 +58,6 @@ export default function HistoryPage() {
   const ITEMS_PER_PAGE = 5;
 
   const [currentPage, setCurrentPage] = useState(1);
-
-  async function getMyBookings() {
-    return fetch("/api/bookings/my").then((res) => res.json());
-  }
 
   useEffect(() => {
     const fetch = isAdmin ? getBookings : getMyBookings;
@@ -101,6 +107,23 @@ export default function HistoryPage() {
     }
   }
 
+  // create booking
+  const [openCreate, setOpenCreate] = useState(false);
+  const [form, setForm] = useState({
+    roomId: 0,
+    purpose: "",
+    start: "",
+    end: "",
+  });
+
+  // rooms
+  const [rooms, setRooms] = useState<any[]>([]);
+  useEffect(() => {
+    if (!isAdmin) {
+      getRooms().then(setRooms);
+    }
+  }, [isAdmin]);
+
   return (
     <Layout>
       {/* SEARCH BAR */}
@@ -132,10 +155,36 @@ export default function HistoryPage() {
         />
       </div>
 
-      {/* JUDUL */}
-      <p className="text-3xl font-extrabold mb-6">
-        {isAdmin ? "All Bookings" : "History"}
-      </p>
+      {/* HEADER */}
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-3xl font-extrabold mb-6">
+          {isAdmin ? "All Bookings" : "History"}
+        </p>
+
+        {!isAdmin && (
+          <div className="flex gap-2 text-center">
+            <button
+              onClick={() => setOpenCreate(true)}
+              className="flex items-center gap-2 rounded-lg bg-[#FEF3C7]! hover:bg-[#fde68a] font-semibold"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="bi bi-plus-lg"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+                />
+              </svg>{" "}
+              <p className="text-sm">Add Booking</p>
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* TABEL */}
       {loading ? (
@@ -268,9 +317,37 @@ export default function HistoryPage() {
                       </div>
                     ) : (
                       <div className="flex justify-center gap-3">
-                        <button>👁️</button>
-                        <button>✏️</button>
-                        <button>🗑️</button>
+                        <button
+                          onClick={() => {
+                            setForm({
+                              roomId: b.roomId,
+                              purpose: b.purpose,
+                              start: b.start.slice(0, 16),
+                              end: b.end.slice(0, 16),
+                            });
+                            setOpenCreate(true);
+                          }}
+                        >
+                          ✏️
+                        </button>
+
+                        <button
+                          onClick={async () => {
+                            if (!confirm("Yakin mau hapus booking ini?"))
+                              return;
+
+                            try {
+                              await deleteMyBooking(b.id);
+                              const data = await getMyBookings();
+                              setBookings(data);
+                              toast.success("Booking deleted");
+                            } catch {
+                              toast.error("Delete failed");
+                            }
+                          }}
+                        >
+                          🗑️
+                        </button>
                       </div>
                     )}
                   </td>
@@ -356,6 +433,7 @@ export default function HistoryPage() {
         </div>
       )}
 
+      {/* MODAL UPDATE STATUS (ADMIN) */}
       {confirmModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-lg">
@@ -394,6 +472,112 @@ export default function HistoryPage() {
                 className="px-4 py-2 rounded text-black hover:bg-blue-700"
               >
                 Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL CREATE BOOKING (USER) */}
+      {openCreate && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-lg">
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Create Booking
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-semibold">Building</label>
+
+                <select
+                  value={form.roomId || ""}
+                  onChange={(e) =>
+                    setForm({ ...form, roomId: Number(e.target.value) })
+                  }
+                  className="w-full mt-1 px-3 py-2 border rounded-lg"
+                >
+                  <option value="">Choose room</option>
+
+                  {rooms.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name} | Building: {r.building}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold">Purpose</label>
+                <input
+                  type="text"
+                  placeholder="Enter purpose"
+                  value={form.purpose}
+                  onChange={(e) =>
+                    setForm({ ...form, purpose: e.target.value })
+                  }
+                  className="w-full mt-1 px-3 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold">Start</label>
+                <input
+                  type="datetime-local"
+                  value={form.start}
+                  onChange={(e) => setForm({ ...form, start: e.target.value })}
+                  className="w-full mt-1 px-3 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold">End</label>
+                <input
+                  type="datetime-local"
+                  value={form.end}
+                  onChange={(e) => setForm({ ...form, end: e.target.value })}
+                  className="w-full mt-1 px-3 py-2 border rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => setOpenCreate(false)}
+                className="px-4 py-2 rounded bg-gray-200"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={async () => {
+                  try {
+                    if (!form.roomId) {
+                      toast.error("Please choose a room!");
+                      return;
+                    }
+
+                    await createBooking({
+                      roomId: form.roomId,
+                      purpose: form.purpose,
+                      start: form.start,
+                      end: form.end,
+                      allDay: false,
+                    });
+
+                    const data = await getMyBookings();
+                    setBookings(data);
+
+                    toast.success("Booking created!");
+                    setOpenCreate(false);
+                    setForm({ roomId: 0, purpose: "", start: "", end: "" });
+                  } catch {
+                    toast.error("Failed to create booking");
+                  }
+                }}
+                className="px-4 py-2 rounded bg-[#FEF3C7]! hover:bg-[#fde68a]! font-semibold"
+              >
+                Submit
               </button>
             </div>
           </div>
