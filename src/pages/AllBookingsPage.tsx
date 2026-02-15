@@ -220,7 +220,7 @@ export default function HistoryPage() {
                   <td className="px-4 py-1">{b.id}</td>
                   <td className="px-4 py-1">{b.firstName}</td>
                   <td className="px-4 py-1">{b.lastName}</td>
-                  <td className="px-4 py-1">{b.room}</td>
+                  <td className="px-4 py-1">{b.roomName}</td>
                   <td className="px-4 py-1">{b.purpose}</td>
                   <td className="px-4 py-1">{formatToWIB(b.start)}</td>
                   <td className="px-4 py-1">{formatToWIB(b.end)}</td>

@@ -1,5 +1,4 @@
 import { API_BASE_URL } from "../config/api";
-import { getCurrentUser } from "../utils/auth";
 
 export async function getBookings() {
   const res = await fetch(`${API_BASE_URL}/bookings`);
@@ -8,10 +7,13 @@ export async function getBookings() {
 }
 
 export async function updateBookingStatus(id: number, status: string) {
+  const token = localStorage.getItem("token");
+
   const res = await fetch(`${API_BASE_URL}/bookings/${id}/status`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ status }),
   });
@@ -25,6 +27,7 @@ export async function updateBookingStatus(id: number, status: string) {
   if (res.status === 204) return null;
   return res.json();
 }
+
 
 export async function createBooking(payload: {
   roomId: number;
