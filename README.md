@@ -49,6 +49,7 @@ Build (Production)
 ```bash
 npm run build
 npm run preview
+```
 
 ## Usage
 1. Pastikan backend API sudah berjalan (akses repository backend pada https://github.com/aishazrh/2026-spaceific-backend.git)
