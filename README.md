@@ -45,6 +45,7 @@ Frontend akan berjalan di URL yang ditampilkan oleh Vite, di
 http://localhost:5173
 ```
 <br>
+
 Build (Production)
 ```
 npm run build
@@ -66,7 +67,8 @@ Aplikasi menyimpan session di localStorage:
 + token → JWT token
 + user → data user (termasuk role, misalnya Admin atau User)
 <br>
-Protected route ada di src/components/ProtectedRoute.tsx (jika tidak ada token/user, akan redirect ke ```/login```).
+
+Protected route ada di ```src/components/ProtectedRoute.tsx``` (jika tidak ada token/user, akan redirect ke ```/login```).
 
 ## Environment Variables
 Di file API (src/api/*.ts) aplikasi memakai API_BASE_URL dari:
