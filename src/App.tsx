@@ -13,19 +13,10 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
 
       <Route
-        path="/admin"
-        element={
-          <ProtectedRoute role="Admin">
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/user"
+        path="/dashboard"
         element={
           <ProtectedRoute>
-            <Rooms />
+            <DashboardPage />
           </ProtectedRoute>
         }
       />

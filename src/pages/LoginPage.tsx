@@ -17,8 +17,8 @@ export default function LoginPage() {
 
       toast.success("Login successful! :)");
 
-      if (res.user.role === "Admin") navigate("/admin");
-      else navigate("/user");
+      if (res.user.role === "Admin") navigate("/dashboard");
+      else navigate("/dashboard");
     } catch (err: any) {
       toast.error(err.message || "Login failed :(");
     }

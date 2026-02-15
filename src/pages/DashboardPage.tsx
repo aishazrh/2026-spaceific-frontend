@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { Link } from "react-router-dom";
-import { getBookings } from "../api/bookings";
+import { getBookings, getMyBookings } from "../api/bookings";
+import { getCurrentUser } from "../utils/auth";
 import "../styles/index.css";
 
 export default function DashboardPage() {
+  const user = getCurrentUser();
+  const isAdmin = user?.role === "Admin";
+
   const [allBookings, setAllBookings] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +26,9 @@ export default function DashboardPage() {
   ).length;
 
   useEffect(() => {
-    getBookings()
+    const fetch = isAdmin ? getBookings : getMyBookings;
+
+    fetch()
       .then((data) => {
         const sorted = [...data].sort((a, b) => b.id - a.id);
         setAllBookings(sorted);
@@ -30,7 +36,7 @@ export default function DashboardPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [isAdmin]);
 
   return (
     <Layout>

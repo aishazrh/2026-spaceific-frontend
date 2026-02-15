@@ -35,8 +35,8 @@ export default function Sidebar() {
             </p>
 
             <Link
-              to="/admin"
-              className={getItemClass("/")}
+              to="/dashboard"
+              className={getItemClass("/dashboard")}
               style={{ color: "black", fontWeight: "bold" }}
             >
               <svg
@@ -138,8 +138,8 @@ export default function Sidebar() {
             </p>
 
             <Link
-              to="/user"
-              className={getItemClass("/")}
+              to="/dashboard"
+              className={getItemClass("/dashboard")}
               style={{ color: "black", fontWeight: "bold" }}
             >
               <svg
