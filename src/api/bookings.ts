@@ -56,33 +56,38 @@ export async function createBooking(payload: {
   return res.json();
 }
 
-export async function updateMyBooking(id: number, payload: any) {
-  const res = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+export async function updateMyBooking(id: number, data: any) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_BASE_URL}/bookings/my/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(data),
   });
 
-  if (!res.ok) throw new Error("Update booking failed");
+  if (!res.ok) throw new Error("Failed to update booking");
+
+  if (res.status === 204) return null;
   return res.json();
 }
 
+export const deleteMyBooking = async (id: number) => {
+  const token = localStorage.getItem("token");
 
-export async function deleteMyBooking(id: number) {
-  const res = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/bookings/my/${id}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
-  if (!res.ok) throw new Error("Delete booking failed");
-  return res.json();
-}
-
+  if (!res.ok) {
+    throw new Error("Delete failed");
+  }
+};
 
 export async function getMyBookings() {
   const token = localStorage.getItem("token");

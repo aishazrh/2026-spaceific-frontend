@@ -1,6 +1,5 @@
-export function formatToWIB(utcString: string) {
-  const cleanUtcString = utcString.endsWith('Z') ? utcString : `${utcString}Z`;
-  const date = new Date(cleanUtcString);
+export function formatToWIB(dateString: string) {
+  const date = new Date(dateString);
 
   const datePart = date.toLocaleDateString("en-US", {
     timeZone: "Asia/Jakarta",
@@ -16,5 +15,5 @@ export function formatToWIB(utcString: string) {
     hour12: true,
   });
 
-  return `${datePart} \n ${timePart}`;
+  return `${datePart} ${timePart}`;
 }
