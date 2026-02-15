@@ -4,6 +4,7 @@ import AllBookings from "./pages/AllBookingsPage";
 import Rooms from "./pages/RoomsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -35,6 +36,15 @@ function App() {
         element={
           <ProtectedRoute>
             <AllBookings />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         }
       />
