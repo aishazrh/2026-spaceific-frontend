@@ -8,6 +8,7 @@ import { getCurrentUser } from "../utils/auth";
 export default function RoomsPage() {
   const user = getCurrentUser();
   const isAdmin = user?.role === "Admin";
+
   const [search, setSearch] = useState("");
   const [rooms, setRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

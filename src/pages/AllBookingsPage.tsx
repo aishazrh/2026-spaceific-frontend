@@ -157,7 +157,7 @@ export default function HistoryPage() {
 
       {/* HEADER */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-3xl font-extrabold mb-6">
+        <p className="text-3xl font-extrabold">
           {isAdmin ? "All Bookings" : "History"}
         </p>
 
@@ -188,7 +188,7 @@ export default function HistoryPage() {
 
       {/* TABEL */}
       {loading ? (
-        <p className="text-center py-4">Loading...</p>
+        <p className="py-10 text-center text-gray-400">Loading...</p>
       ) : (
         <div className="overflow-x-auto bg-[#FFFFFF] rounded-xl p-4">
           <table className="w-full text-left border-separate border-spacing-y-3">
