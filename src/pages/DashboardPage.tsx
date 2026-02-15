@@ -217,7 +217,7 @@ export default function DashboardPage() {
                       <td className="px-4 py-1">{b.id}</td>
                       <td className="px-4 py-1">{b.firstName}</td>
                       <td className="px-4 py-1">{b.lastName}</td>
-                      <td className="px-4 py-1">{b.room}</td>
+                      <td className="px-4 py-1">{b.roomName}</td>
                       <td className="px-4 py-1">{b.purpose}</td>
                       <td className="px-4 py-1 text-center">
                         <span
